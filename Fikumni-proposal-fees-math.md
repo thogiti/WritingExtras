@@ -26,7 +26,7 @@ The cache is an in-memory data structure maintained by RPC nodes. It maps accoun
 
 Mathematically, the cache $\mathcal{C}$ can be represented as:
 
-$$\mathcal{C} = \left\{ (a, f_r(a), \text{median}(a), \text{p90}(a)) \mid a \in \mathcal{A} \right\}.$$
+$$C = \{ (a, f_r(a), \text{median}(a), \text{p90}(a)) \mid a \in A \}.$$
 
 ---
 
