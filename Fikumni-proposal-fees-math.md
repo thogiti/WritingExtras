@@ -1,4 +1,7 @@
 
+#### Note
+This is a mathematically formalized document of the proposal from Fikumni. You can read his original proposal [here.](https://github.com/fikunmi-ap/solana-improvement-documents/blob/restrict-tfm-bidspace/restrict-tfm-bidspace.md)
+
 #### Overview
 The proposal introduces a recommended priority fee system based on recent fee data and account contention. The goal is to improve fee predictability and block utilization while minimizing protocol changes. The system relies on a cache maintained by RPC nodes to map accounts to recommended fees.
 
