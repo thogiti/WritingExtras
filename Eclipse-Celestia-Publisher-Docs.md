@@ -98,6 +98,60 @@ Key Points:
 
 ## 5. Data Flow and Processing Pipeline
 
+Below is a consolidated sequence diagram combining all phases:
+
+```mermaid
+sequenceDiagram
+    participant S as Solana Chain
+    participant SR as SolanaRetriever
+    participant DB1 as DB: celestia_publisher_index
+    participant CP as CelestiaPublisher
+    participant C as Celestia Network
+    participant DB2 as DB: gateway_publisher_index
+    participant GP as GatewayPublisher
+    participant E as Ethereum Gateway
+
+    Note left of S: (Source Layer)
+    Note right of C: (Data Availability Layer)
+    Note right of E: (Gateway Layer)
+
+    rect rgb(240, 240, 240)
+        SR->>+S: (1) Get blocks (batch_size=M)
+        S-->>-SR: Return blocks
+        SR->>DB1: Index blocks (parent_slot, block)
+    end
+
+    rect rgb(232, 244, 253)
+        loop For each Celestia batch
+            CP->>DB1: Check if commitments exist
+            alt No commitments found
+                CP->>C: submit_block_batch
+                C-->>CP: Return (celestia_height, commitments)
+                CP->>DB1: Update blocks with (height, commitments)
+            else Already published
+                Note over CP: Skip re-publish
+            end
+        end
+    end
+
+    rect rgb(243, 238, 254)
+        Note right of GP: Gateway sync after N Celestia batches
+        CP->>DB1: Retrieve N*M blocks
+        CP->>CP: Generate Merkle root
+        CP->>GP: Create BatchHeader
+        GP->>DB2: Insert header as QUEUED
+        GP->>E: Submit batch header (transaction)
+        E-->>GP: Return transaction info
+        GP->>DB2: Mark header PENDING
+        alt Tx confirmed
+            E-->>GP: Emit BatchSubmitted event
+            GP->>DB2: Mark header CONFIRMED
+        else Tx fails
+            GP->>DB2: Mark header ERRORED
+        end
+    end
+```
+
 The core pipeline:
 
 1. Block Indexing (Source Layer): `SolanaRetriever` continuously fetches and indexes Solana blocks.  
@@ -273,6 +327,21 @@ All configuration can be loaded from a TOML file or overridden by environment va
 - `SERVER_PORT`: Port for the HTTP server (health checks, metrics).  
 
 All have sensible defaults for local testing.
+
+Sample `config.tml`:
+```toml
+[publisher]
+db_path = "data/publisher_db"
+celestia_node_url = "http://localhost:11111"
+celestia_node_auth_token = "my-secret-token"
+eclipse_node_url = "http://localhost:8899"
+celestia_namespace = "11223344aabbccddeeff"
+eth_url = "https://mainnet.infura.io/v3/myproject"
+eth_chain_id = 1
+gateway_address = "0xGatewayDeployedAddress"
+gateway_appender_secret_key = "0xPrivateKeyHere"
+server_port = 8080
+```
 
 ---
 
