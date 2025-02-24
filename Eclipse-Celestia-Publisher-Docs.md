@@ -25,7 +25,7 @@
     - [Cache Module](#cache-module)  
 11. [Usage Examples](#usage-examples)  
 12. [Implementation Details and Code Snippets](#implementation-details-and-code-snippets)  
-13. [Conclusion and Future Work](#conclusion-and-future-work)  
+
 
 ---
 
@@ -439,24 +439,4 @@ match self.gateway.submit_batch(batch_header.clone()).send().await {
     }
 }
 ```
-
----
-
-## 13. Conclusion and Future Work
-
-By splitting the pipeline into Solana retrieval, Celestia publishing, and Ethereum gateway anchoring, the Eclipse Celestia Publisher achieves:
-
-- High Throughput for data ingestion (large batches).  
-- Robust DA Guarantees via Celestia’s advanced erasure coding and sampling.  
-- On-Chain Settlement on Ethereum with easy dispute resolution or fallback if Celestia data is not actually available.
-
-Potential enhancements include:
-
-- Dynamic batch sizing if certain slots are empty or late.  
-- Advanced concurrency (e.g., parallel Celestia submissions).  
-- Better monitoring for partial failures and automated restarts.  
-- Multi-DA support if additional data availability layers are used in the future.
-
-With the detailed diagrams, sequence flows, database schemas, and configuration references provided here, developers can gain a thorough grasp of how to maintain, extend, or integrate the Eclipse Celestia Publisher system in their own projects.
-
 ---
